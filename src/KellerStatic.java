@@ -21,6 +21,7 @@ public class KellerStatic<K> implements ADT_Speicher<K> {
         K element = elements[topIndex];
         topIndex--;
         return element;
+
     }
 
     @Override
