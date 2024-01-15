@@ -26,7 +26,7 @@ public class Stack<K> implements ADT_Storage<K> {
         return topNode == null;
     }
 
-    private class Node<K> {
+    private static class Node<K> {
         private Node<K> previousNode;
         private K element;
 
