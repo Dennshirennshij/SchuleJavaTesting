@@ -1,7 +1,7 @@
-public class Keller<K> implements ADT_Speicher<K> {
+public class Stack<K> implements ADT_Storage<K> {
     private Node<K> topNode;
 
-    public Keller() {
+    public Stack() {
         topNode = null;
     }
 

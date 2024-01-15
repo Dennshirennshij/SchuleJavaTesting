@@ -1,4 +1,4 @@
-public interface ADT_Speicher<K> {
+public interface ADT_Storage<K> {
     public abstract void push(K element);
     public abstract K pop();
     public abstract K peek();
