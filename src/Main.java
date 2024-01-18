@@ -8,6 +8,7 @@ public class Main {
         }
         while(!KELLER.isEmpty()) {
             System.out.println(KELLER.dequeue());
+            System.out.println(KELLER.getLength());
         }
     }
 }
