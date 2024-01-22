@@ -1,9 +1,12 @@
-import java.util.ArrayList;
-import java.util.Objects;
-
 public class List<K> {
     private Node<K> node;
+    public List() {
+        node = null;
+    }
     private Node<K> getNode0(){
+        if (node == null) {
+            return null;
+        }
         while (node.previousNode != null) {
             node = node.previousNode;
         }
@@ -30,7 +33,11 @@ public class List<K> {
     public K get(int i) throws IndexOutOfBoundsException{
         return getNode(i).element;
     }
-    public void add(K object) {
+    public void set(K element, int index) throws IndexOutOfBoundsException{
+        getNode(index).element = element;
+    }
+    private void addSingle(K object){
+        System.out.println("Tryed: Added " + object.toString() + " to List");
         int size = getSize();
         if (size == 0) {
             node = new Node<K>(object);
@@ -38,6 +45,12 @@ public class List<K> {
             Node<K> node = getNode(size - 1); //Last Node
             node.nextNode = new Node<K>(object);
             node.nextNode.previousNode = node;
+        }
+        System.out.println("Added " + object.toString() + " to List");
+    }
+    public void add(K... objects) {
+        for (K object : objects) {
+            addSingle(object);
         }
     }
     public void add(int index, K object) {
@@ -87,15 +100,61 @@ public class List<K> {
         }
         return -1;
     }
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+        Node<K> node = getNode0();
+        while (node != null) {
+            stringBuilder.append(node.element.toString());
+            if (node.nextNode != null) {
+                stringBuilder.append(", ");
+            }
+            node = node.nextNode;
+        }
+        stringBuilder.append("]");
+        return stringBuilder.toString();
+    }
+
+    public void sort(Comperator<K> sortingPattern, SortingMethod sortingMethod) {
+        switch (sortingMethod.toString()) {
+            case "BUBBLE_SORT":
+                bubbleSort(this, getSize(), sortingPattern);
+                break;
+            default:
+                throw new IllegalArgumentException("Sorting Method " + sortingMethod.toString() + " not found");
+        }
+    }
     //Bubble Sort
-    public void sort(Comperator<K> sortingPattern) {
-        //TODO
+    private void bubbleSort(List<K> list, int n, Comperator<K> sortingPattern)
+    {
+        if (n == 1)                     //passes are done
+        {
+            return;
+        }
+
+        for (int i=0; i<n-1; i++)       //iteration through unsorted elements
+        {
+            if (sortingPattern.compare(list.get(i), list.get(i+1)))      //check if the elements are in order
+            {                           //if not, swap them
+                K temp = list.get(i);
+                list.set(list.get(i+1), i);
+                list.set(temp, i+1);
+            }
+        }
+
+        bubbleSort(list, n-1, sortingPattern);           //one pass done, proceed to the next
     }
     //Merge Sort
     //Quick Sort
 
+
+
     public static abstract class Comperator<K> {
         public abstract boolean compare(K a, K b); //returns true if a should have a higher index than b
+    }
+    public static enum SortingMethod {
+        BUBBLE_SORT
     }
     private static class Node<K> {
         public Node<K> previousNode;
