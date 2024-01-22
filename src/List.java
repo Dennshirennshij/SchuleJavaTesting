@@ -132,18 +132,21 @@ public class List<K> {
         {
             return;
         }
-
+        boolean traded = false;
         for (int i=0; i<n-1; i++)       //iteration through unsorted elements
         {
             if (sortingPattern.compare(list.get(i), list.get(i+1)))      //check if the elements are in order
             {                           //if not, swap them
+                traded = true;
                 K temp = list.get(i);
                 list.set(list.get(i+1), i);
                 list.set(temp, i+1);
             }
         }
-
-        bubbleSort(list, n-1, sortingPattern);           //one pass done, proceed to the next
+        if (traded)            //if no elements were swapped, the list is sorted
+        {
+            bubbleSort(list, n-1, sortingPattern);
+        }
     }
     //Merge Sort
     //Quick Sort
