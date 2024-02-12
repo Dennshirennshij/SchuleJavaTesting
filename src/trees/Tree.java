@@ -21,11 +21,9 @@ public abstract class Tree<K> {
         }
         return result;
     }
-
     public ArrayList<K> inOrder() {
         return inOrder(new ArrayList<K>(), getRoot());
     }
-
     private ArrayList<K> inOrder(ArrayList<K> stringList, Node<K> currentNode) {
         if (currentNode == null) return stringList;
         if (currentNode.getLeft() != null) {
@@ -45,9 +43,9 @@ public abstract class Tree<K> {
     }
 
     public void debuggingDisplay() {
-        output(this.getRoot());
+        outputDebug(this.getRoot());
     }
-    private void output(Node<K> node) {
+    private void outputDebug(Node<K> node) {
         System.out.println("Knoten " + node.getValue().toString() + ": ");
         System.out.println("----- Balance: " + node.getBalance());
         if (node.getParent()!=null) System.out.println("----- Parent: " + node.getParent().getValue()); else System.out.println("----- Parent: none");
@@ -56,10 +54,10 @@ public abstract class Tree<K> {
         System.out.println();
         System.out.println();
         if (node.getLeft() != null) {
-            output(node.getLeft());
+            outputDebug(node.getLeft());
         }
         if (node.getRight() != null) {
-            output(node.getRight());
+            outputDebug(node.getRight());
         }
     }
 
@@ -97,8 +95,8 @@ public abstract class Tree<K> {
         }
     }
     private void checkBalance(Node<K> parentNode, Node<K> previousNode) {
-        if (previousNode.getDirection() == Direction.LEFT) parentNode.descreaseBalence();
-        if (previousNode.getDirection() == Direction.RIGHT) parentNode.increaseBalence();
+        if (previousNode.getDirection() == Direction.LEFT) parentNode.descreaseBalance();
+        if (previousNode.getDirection() == Direction.RIGHT) parentNode.increaseBalance();
         if (parentNode.getBalance() == 0) return;
         if (parentNode.getBalance() == 1 || parentNode.getBalance() == -1) {
             if (parentNode == getRoot()) return;
@@ -128,11 +126,11 @@ public abstract class Tree<K> {
 
     }
     private void balance(Node<K> problemNode, ProblemCase problemCase) {
-        System.out.println("Executing " +
+        /*System.out.println("Executing " +
                 (problemCase==ProblemCase.LEFT_LEFT?"left_left":"") +
                 (problemCase==ProblemCase.RIGHT_LEFT?"right_left":"") +
                 (problemCase==ProblemCase.LEFT_RIGHT?"left_right":"") +
-                (problemCase==ProblemCase.RIGHT_RIGHT?"right_right":""));
+                (problemCase==ProblemCase.RIGHT_RIGHT?"right_right":""));*/
         switch (problemCase) {
             case LEFT_LEFT -> {
                 problemNode.setBalance((byte) 0);
@@ -246,10 +244,10 @@ public abstract class Tree<K> {
         public byte getBalance() {
             return balance;
         }
-        public void increaseBalence (){
+        public void increaseBalance(){
             balance++;
         }
-        public void descreaseBalence() {
+        public void descreaseBalance() {
             balance--;
         }
         public Direction getDirection () {
