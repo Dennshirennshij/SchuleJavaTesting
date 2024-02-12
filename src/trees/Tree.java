@@ -226,13 +226,6 @@ public abstract class Tree<K> {
             this.left = null;
         }
 
-        public boolean isLeaf() {
-            return right==null && left==null;
-        }
-        public boolean isHalfLeaf() {
-            return right==null || left==null;
-        }
-
         private void setParent(Node<K> parent) {
             this.parent = parent;
         }
@@ -270,6 +263,6 @@ public abstract class Tree<K> {
             this.balance = balance;
         }
     }
-    protected enum ProblemCase {RIGHT_RIGHT, RIGHT_LEFT, LEFT_RIGHT, LEFT_LEFT;}
-    protected enum Direction {LEFT,RIGHT,ROOT,ERROR;}
+    protected enum ProblemCase {RIGHT_RIGHT, RIGHT_LEFT, LEFT_RIGHT, LEFT_LEFT}
+    protected enum Direction {LEFT,RIGHT,ROOT,ERROR}
 }
