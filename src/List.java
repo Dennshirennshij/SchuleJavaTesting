@@ -148,10 +148,6 @@ public class List<K> {
             bubbleSort(list, n-1, sortingPattern);
         }
     }
-    //Merge Sort
-    //Quick Sort
-
-
 
     public static abstract class Comperator<K> {
         public abstract boolean compare(K a, K b); //returns true if a should have a higher index than b
