@@ -1,9 +1,10 @@
 package trees;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public abstract class Tree<K> {
+public abstract class Tree<K> implements Iterable<K> {
 
     private Node<K> root;
     /**
@@ -79,6 +80,11 @@ public abstract class Tree<K> {
         }
         stringList.add(currentNode.getValue());
         return stringList;
+    }
+
+    // Iterator
+    public Iterator<K> iterator() {
+        return inOrder().iterator();
     }
 
 
