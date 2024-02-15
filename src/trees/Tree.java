@@ -1,6 +1,7 @@
 package trees;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Tree<K> {
 
@@ -13,35 +14,7 @@ public abstract class Tree<K> {
         return root;
     }
 
-    public ArrayList<String> inOrderString () {
-        ArrayList<String> result = new ArrayList<>();
-        ArrayList<K> values = inOrder();
-        for (K value : values) {
-            result.add(value.toString());
-        }
-        return result;
-    }
-    public ArrayList<K> inOrder() {
-        return inOrder(new ArrayList<K>(), getRoot());
-    }
-    private ArrayList<K> inOrder(ArrayList<K> stringList, Node<K> currentNode) {
-        if (currentNode == null) return stringList;
-        if (currentNode.getLeft() != null) {
-            stringList = inOrder(stringList, currentNode.getLeft());
-        }
-        stringList.add(currentNode.getValue());
-        if (currentNode.getRight() != null) {
-            stringList = inOrder(stringList, currentNode.getRight());
-        }
-        return stringList;
-    }
-
-    public void insert(K... values) {
-        for (K value : values) {
-            insertSingle(value);
-        }
-    }
-
+    // Debugging Display
     public void debuggingDisplay() {
         outputDebug(this.getRoot());
     }
@@ -62,6 +35,65 @@ public abstract class Tree<K> {
     }
 
 
+    // Output Functions
+    public void outputInOrder() {
+        List<String> output = inOrder().stream().map(Object::toString).toList();
+        for (String str: output) {
+            System.out.println(str);
+        }
+    }
+    public List<K> inOrder() {
+        return inOrderRec(new ArrayList<K>(), getRoot());
+    }
+    private ArrayList<K> inOrderRec(ArrayList<K> stringList, Node<K> currentNode) {
+        if (currentNode == null) return stringList;
+        if (currentNode.getLeft() != null) {
+            stringList = inOrderRec(stringList, currentNode.getLeft());
+        }
+        stringList.add(currentNode.getValue());
+        if (currentNode.getRight() != null) {
+            stringList = inOrderRec(stringList, currentNode.getRight());
+        }
+        return stringList;
+    }
+
+    public List<K> preOrder() {
+        return preOrderRec(new ArrayList<K>(), getRoot());
+    }
+    private ArrayList<K> preOrderRec(ArrayList<K> stringList, Node<K> currentNode) {
+        if (currentNode == null) return stringList;
+        stringList.add(currentNode.getValue());
+        if (currentNode.getLeft() != null) {
+            stringList = preOrderRec(stringList, currentNode.getLeft());
+        }
+        if (currentNode.getRight() != null) {
+            stringList = preOrderRec(stringList, currentNode.getRight());
+        }
+        return stringList;
+    }
+
+    public List<K> postOrder() {
+        return postOrderRec(new ArrayList<K>(), getRoot());
+    }
+    private ArrayList<K> postOrderRec(ArrayList<K> stringList, Node<K> currentNode) {
+        if (currentNode == null) return stringList;
+        if (currentNode.getLeft() != null) {
+            stringList = postOrderRec(stringList, currentNode.getLeft());
+        }
+        if (currentNode.getRight() != null) {
+            stringList = postOrderRec(stringList, currentNode.getRight());
+        }
+        stringList.add(currentNode.getValue());
+        return stringList;
+    }
+
+
+    // Insertion
+    public void insert(K... values) {
+        for (K value : values) {
+            insertSingle(value);
+        }
+    }
     private void insertSingle(K value) {
         System.out.println("Inserting " + value.toString());
         if (root == null) {
@@ -94,6 +126,9 @@ public abstract class Tree<K> {
             }
         }
     }
+
+
+    // Balance Checking
     private void checkBalance(Node<K> parentNode, Node<K> previousNode) {
         if (previousNode.getDirection() == Direction.LEFT) parentNode.descreaseBalance();
         if (previousNode.getDirection() == Direction.RIGHT) parentNode.increaseBalance();
@@ -164,7 +199,10 @@ public abstract class Tree<K> {
             }
         }
     }
+    protected enum ProblemCase {RIGHT_RIGHT, RIGHT_LEFT, LEFT_RIGHT, LEFT_LEFT}
 
+
+    //Turning
     private void turnLeft(Node<K> father) {
         Node<K> parent = father.getParent();
         Node<K> rightChild = father.getRight();
@@ -195,14 +233,27 @@ public abstract class Tree<K> {
         leftChild.setRight(father);
         father.setLeft(leftRightChild);
     }
+    protected enum Direction {LEFT,RIGHT,ROOT,ERROR}
 
+
+    // The Node
     protected static class Node<K> {
+        // Variables
         private Node<K> parent;
         private Node<K> left;
         private Node<K> right;
         private byte balance;
         private K value;
 
+        //Constructor
+        public Node(K value, Node<K> parent) {
+            this.value = value;
+            this.parent = parent;
+            this.balance = 0;
+            this.right = null;
+            this.left = null;
+        }
+        //Getter
         public K getValue() {
             return value;
         }
@@ -215,15 +266,15 @@ public abstract class Tree<K> {
         public Node<K> getLeft() {
             return left;
         }
-
-        public Node(K value, Node<K> parent) {
-            this.value = value;
-            this.parent = parent;
-            this.balance = 0;
-            this.right = null;
-            this.left = null;
+        public Direction getDirection () {
+            if (getParent() == null) return Direction.ROOT;
+            if (getParent().getRight() == this) return Direction.RIGHT;
+            if (getParent().getLeft() == this) return Direction.LEFT;
+            System.out.println("Error getting direction from " + this.getValue());
+            return Direction.ERROR;
         }
 
+        // Setter
         private void setParent(Node<K> parent) {
             this.parent = parent;
         }
@@ -241,6 +292,8 @@ public abstract class Tree<K> {
                 case RIGHT -> {setRight(child);break;}
             }
         }
+
+        // Balance
         public byte getBalance() {
             return balance;
         }
@@ -250,17 +303,8 @@ public abstract class Tree<K> {
         public void descreaseBalance() {
             balance--;
         }
-        public Direction getDirection () {
-            if (getParent() == null) return Direction.ROOT;
-            if (getParent().getRight() == this) return Direction.RIGHT;
-            if (getParent().getLeft() == this) return Direction.LEFT;
-            System.out.println("Error getting direction from " + this.getValue());
-            return Direction.ERROR;
-        }
         public void setBalance(byte balance) {
             this.balance = balance;
         }
     }
-    protected enum ProblemCase {RIGHT_RIGHT, RIGHT_LEFT, LEFT_RIGHT, LEFT_LEFT}
-    protected enum Direction {LEFT,RIGHT,ROOT,ERROR}
 }
