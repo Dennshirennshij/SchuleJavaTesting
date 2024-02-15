@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class Tree<K> implements Iterable<K> {
+public class Tree<K extends Comparable<K>> implements Iterable<K> {
 
     private Node<K> root;
     /**
      * @return true if value a is to be before/above value b
      */
-    protected abstract boolean compare(K a, K b);
     protected Node<K> getRoot() {
         return root;
     }
+
 
     // Debugging Display
     public void debuggingDisplay() {
@@ -51,7 +51,6 @@ public abstract class Tree<K> implements Iterable<K> {
         }
         return stringList;
     }
-
     public List<K> preOrder() {
         return preOrderRec(new ArrayList<>(), getRoot());
     }
@@ -82,6 +81,7 @@ public abstract class Tree<K> implements Iterable<K> {
         return stringList;
     }
 
+
     // Iterator
     public Iterator<K> iterator() {
         return inOrder().iterator();
@@ -95,19 +95,19 @@ public abstract class Tree<K> implements Iterable<K> {
         }
     }
     private void insertSingle(K value) {
-        System.out.println("Inserting " + value.toString());
+        System.out.println("Inserting " + value.toString()); // Debugging
         if (root == null) {
             root = new Node<>(value, null);
         } else {
             Node<K> currentNode = this.getRoot();
             while (true) {
                 K currentNodeValue = currentNode.getValue();
-                if (!compare(currentNodeValue, value)) {
+                if (/*!compare(currentNodeValue, value)*/currentNodeValue.compareTo(value) > 0) {
                     // Wenn value links von currentNode eingefügt werden soll
                     if (currentNode.getLeft() == null) { // left node is non-existent, it's a half-leaf or leaf node
                         Node<K> newNode = new Node<>(value, currentNode); // Creates a new node instance
                         currentNode.setLeft(newNode); // Adds the node to the left side of the current node
-                        checkBalance(currentNode, newNode); // Checks for balance
+                        checkBalanceInsert(currentNode, newNode); // Checks for balance
                         break; // breaks out of the while true loop
                     } else { // left node is existent
                         currentNode = currentNode.getLeft();
@@ -117,7 +117,7 @@ public abstract class Tree<K> implements Iterable<K> {
                     if (currentNode.getRight() == null) { // left node is non-existent, it's a half-leaf or leaf node
                         Node<K> newNode = new Node<>(value, currentNode); // Creates a new node instance
                         currentNode.setRight(newNode); // Adds the node to the right side of the current node
-                        checkBalance(currentNode, newNode); // Checks for balance
+                        checkBalanceInsert(currentNode, newNode); // Checks for balance
                         break; // breaks out of the while true loop
                     } else { // right node is existent
                         currentNode = currentNode.getRight();
@@ -126,29 +126,14 @@ public abstract class Tree<K> implements Iterable<K> {
             }
         }
     }
-
-
-    //Deletion
-    private Node<K> findLeftNeighboor (Node<K> node) {
-        if (node.getLeft() == null) return null;
-        else return goToRightRec(node.getLeft());
-    }
-    private Node<K> goToRightRec(Node<K> node) {
-        if (node.getRight() == null) return node;
-        else return goToRightRec(node.getRight());
-    }
-
-
-
-    // Balance Checking
-    private void checkBalance(Node<K> parentNode, Node<K> previousNode) {
+    private void checkBalanceInsert(Node<K> parentNode, Node<K> previousNode) {
         if (previousNode.getDirection() == Direction.LEFT) parentNode.descreaseBalance();
         if (previousNode.getDirection() == Direction.RIGHT) parentNode.increaseBalance();
         if (parentNode.getBalance() == 0) return;
         if (parentNode.getBalance() == 1 || parentNode.getBalance() == -1) {
             if (parentNode == getRoot()) return;
             // Check the balance up a row
-            checkBalance(parentNode.getParent(), parentNode);
+            checkBalanceInsert(parentNode.getParent(), parentNode);
             return;
         }
         if (parentNode.getBalance() == 2) {
@@ -172,6 +157,26 @@ public abstract class Tree<K> implements Iterable<K> {
         }
 
     }
+
+
+    //Deletion
+    private Node<K> findLeftNeighboor (Node<K> node) {
+        if (node.getLeft() == null) return null;
+        else return goToRightRec(node.getLeft());
+    }
+    private Node<K> goToRightRec(Node<K> node) {
+        if (node.getRight() == null) return node;
+        else return goToRightRec(node.getRight());
+    }
+    private Node<K> find (K value) {return findRec(value, getRoot());}
+    private Node<K> findRec (K value, Node<K> currentNode) {
+        if (value.compareTo(currentNode.getValue()) == 0) {
+            return currentNode;
+        } else //todo
+    }
+
+
+    // Balance Checking
     private void balance(Node<K> problemNode, ProblemCase problemCase) {
         if (problemCase == ProblemCase.LEFT_LEFT) {
             problemNode.setBalance((byte) 0);
