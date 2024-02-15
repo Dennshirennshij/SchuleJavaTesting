@@ -38,7 +38,7 @@ public abstract class Tree<K> implements Iterable<K> {
 
     // Output Functions
     public List<K> inOrder() {
-        return inOrderRec(new ArrayList<K>(), getRoot());
+        return inOrderRec(new ArrayList<>(), getRoot());
     }
     private ArrayList<K> inOrderRec(ArrayList<K> stringList, Node<K> currentNode) {
         if (currentNode == null) return stringList;
@@ -53,7 +53,7 @@ public abstract class Tree<K> implements Iterable<K> {
     }
 
     public List<K> preOrder() {
-        return preOrderRec(new ArrayList<K>(), getRoot());
+        return preOrderRec(new ArrayList<>(), getRoot());
     }
     private ArrayList<K> preOrderRec(ArrayList<K> stringList, Node<K> currentNode) {
         if (currentNode == null) return stringList;
@@ -68,7 +68,7 @@ public abstract class Tree<K> implements Iterable<K> {
     }
 
     public List<K> postOrder() {
-        return postOrderRec(new ArrayList<K>(), getRoot());
+        return postOrderRec(new ArrayList<>(), getRoot());
     }
     private ArrayList<K> postOrderRec(ArrayList<K> stringList, Node<K> currentNode) {
         if (currentNode == null) return stringList;
@@ -97,7 +97,7 @@ public abstract class Tree<K> implements Iterable<K> {
     private void insertSingle(K value) {
         System.out.println("Inserting " + value.toString());
         if (root == null) {
-            root = new Node<K>(value, null);
+            root = new Node<>(value, null);
         } else {
             Node<K> currentNode = this.getRoot();
             while (true) {
@@ -105,7 +105,7 @@ public abstract class Tree<K> implements Iterable<K> {
                 if (!compare(currentNodeValue, value)) {
                     // Wenn value links von currentNode eingefügt werden soll
                     if (currentNode.getLeft() == null) { // left node is non-existent, it's a half-leaf or leaf node
-                        Node<K> newNode = new Node<K>(value, currentNode); // Creates a new node instance
+                        Node<K> newNode = new Node<>(value, currentNode); // Creates a new node instance
                         currentNode.setLeft(newNode); // Adds the node to the left side of the current node
                         checkBalance(currentNode, newNode); // Checks for balance
                         break; // breaks out of the while true loop
@@ -115,7 +115,7 @@ public abstract class Tree<K> implements Iterable<K> {
                 } else {
                     // Wenn value rechts von currentNode eingefügt werden soll
                     if (currentNode.getRight() == null) { // left node is non-existent, it's a half-leaf or leaf node
-                        Node<K> newNode = new Node<K>(value, currentNode); // Creates a new node instance
+                        Node<K> newNode = new Node<>(value, currentNode); // Creates a new node instance
                         currentNode.setRight(newNode); // Adds the node to the right side of the current node
                         checkBalance(currentNode, newNode); // Checks for balance
                         break; // breaks out of the while true loop
@@ -126,6 +126,18 @@ public abstract class Tree<K> implements Iterable<K> {
             }
         }
     }
+
+
+    //Deletion
+    private Node<K> findLeftNeighboor (Node<K> node) {
+        if (node.getLeft() == null) return null;
+        else return goToRightRec(node.getLeft());
+    }
+    private Node<K> goToRightRec(Node<K> node) {
+        if (node.getRight() == null) return node;
+        else return goToRightRec(node.getRight());
+    }
+
 
 
     // Balance Checking
@@ -161,42 +173,28 @@ public abstract class Tree<K> implements Iterable<K> {
 
     }
     private void balance(Node<K> problemNode, ProblemCase problemCase) {
-        /*System.out.println("Executing " +
-                (problemCase==ProblemCase.LEFT_LEFT?"left_left":"") +
-                (problemCase==ProblemCase.RIGHT_LEFT?"right_left":"") +
-                (problemCase==ProblemCase.LEFT_RIGHT?"left_right":"") +
-                (problemCase==ProblemCase.RIGHT_RIGHT?"right_right":""));*/
-        switch (problemCase) {
-            case LEFT_LEFT -> {
-                problemNode.setBalance((byte) 0);
-                problemNode.getLeft().setBalance((byte) 0);
-                turnRight(problemNode);
-                break;
-            }
-            case RIGHT_RIGHT -> {
-                problemNode.setBalance((byte) 0);
-                problemNode.getRight().setBalance((byte) 0);
-                turnLeft(problemNode);
-                break;
-            }
-            case LEFT_RIGHT -> {
-                Node<K> leftChild = problemNode.getLeft();
-                problemNode.setBalance((byte) 0);
-                leftChild.setBalance((byte) 0);
+        if (problemCase == ProblemCase.LEFT_LEFT) {
+            problemNode.setBalance((byte) 0);
+            problemNode.getLeft().setBalance((byte) 0);
+            turnRight(problemNode);
+        } else if (problemCase == ProblemCase.RIGHT_RIGHT) {
+            problemNode.setBalance((byte) 0);
+            problemNode.getRight().setBalance((byte) 0);
+            turnLeft(problemNode);
+        } else if (problemCase == ProblemCase.LEFT_RIGHT) {
+            Node<K> leftChild = problemNode.getLeft();
+            problemNode.setBalance((byte) 0);
+            leftChild.setBalance((byte) 0);
 
-                turnLeft(leftChild);
-                turnRight(problemNode);
-                break;
-            }
-            case RIGHT_LEFT -> {
-                Node<K> rightChild = problemNode.getRight();
-                problemNode.setBalance((byte) 0);
-                rightChild.setBalance((byte) 0);
+            turnLeft(leftChild);
+            turnRight(problemNode);
+        } else if (problemCase == ProblemCase.RIGHT_LEFT) {
+            Node<K> rightChild = problemNode.getRight();
+            problemNode.setBalance((byte) 0);
+            rightChild.setBalance((byte) 0);
 
-                turnRight(rightChild);
-                turnLeft(problemNode);
-                break;
-            }
+            turnRight(rightChild);
+            turnLeft(problemNode);
         }
     }
     protected enum ProblemCase {RIGHT_RIGHT, RIGHT_LEFT, LEFT_RIGHT, LEFT_LEFT}
@@ -243,7 +241,7 @@ public abstract class Tree<K> implements Iterable<K> {
         private Node<K> left;
         private Node<K> right;
         private byte balance;
-        private K value;
+        private final K value;
 
         //Constructor
         public Node(K value, Node<K> parent) {
@@ -287,10 +285,8 @@ public abstract class Tree<K> implements Iterable<K> {
             if (this.right != null) this.right.setParent(this);
         }
         public void setChild(Node<K> child, Direction direction) {
-            switch (direction) {
-                case LEFT -> {setLeft(child);break;}
-                case RIGHT -> {setRight(child);break;}
-            }
+            if (direction == Direction.LEFT) setLeft(child);
+            else if (direction == Direction.RIGHT) setRight(child);
         }
 
         // Balance
