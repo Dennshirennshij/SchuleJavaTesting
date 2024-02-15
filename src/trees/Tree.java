@@ -36,12 +36,6 @@ public abstract class Tree<K> {
 
 
     // Output Functions
-    public void outputInOrder() {
-        List<String> output = inOrder().stream().map(Object::toString).toList();
-        for (String str: output) {
-            System.out.println(str);
-        }
-    }
     public List<K> inOrder() {
         return inOrderRec(new ArrayList<K>(), getRoot());
     }
