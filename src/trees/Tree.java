@@ -172,8 +172,17 @@ public class Tree<K extends Comparable<K>> implements Iterable<K> {
     private Node<K> findRec (K value, Node<K> currentNode) {
         if (value.compareTo(currentNode.getValue()) == 0) {
             return currentNode;
-        } else //todo
+        } else if (value.compareTo(currentNode.getValue()) < 0) {
+            // value vor currentNode.getValue()
+            if (currentNode.getLeft() == null) return null;
+            else return findRec(value, currentNode.getLeft());
+        } else {
+            // value nach currentNode.getValue()
+            if (currentNode.getRight() == null) return null;
+            else return findRec(value, currentNode.getRight());
+        }
     }
+    
 
 
     // Balance Checking
