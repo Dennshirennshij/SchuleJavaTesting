@@ -1,5 +1,6 @@
 package trees;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -160,13 +161,13 @@ public class Tree<K extends Comparable<K>> implements Iterable<K> {
 
 
     //Deletion
-    private Node<K> findLeftNeighboor (Node<K> node) {
-        if (node.getLeft() == null) return null;
-        else return goToRightRec(node.getLeft());
+    private Node<K> findRightNeighboor (Node<K> node) {
+        if (node.getRight() == null) return null;
+        else return goToLeftRec(node.getRight());
     }
-    private Node<K> goToRightRec(Node<K> node) {
-        if (node.getRight() == null) return node;
-        else return goToRightRec(node.getRight());
+    private Node<K> goToLeftRec(Node<K> node) {
+        if (node.getLeft() == null) return node;
+        else return goToLeftRec(node.getLeft());
     }
     private Node<K> find (K value) {return findRec(value, getRoot());}
     private Node<K> findRec (K value, Node<K> currentNode) {
@@ -182,10 +183,94 @@ public class Tree<K extends Comparable<K>> implements Iterable<K> {
             else return findRec(value, currentNode.getRight());
         }
     }
+    private boolean delete (Node<K> node) {
+        if (node == null) return false; // node cannot not be null
+        if (node.getRight() == null && node.getLeft() == null) { // Node without children shall be deleted
+            if (node == root) { root = null; return true; } // Only element should be deleted
+            checkBalanceDeletion(node.getParent(), node);
+            node.getParent().setChild(null, node.getDirection());
+            return true;
+        } else if (node.getRight() != null && node.getLeft() == null) {
+            if (node==root) { root = node.getRight(); return true; }
+            checkBalanceDeletion(node.getParent(), node);
+            node.getParent().setChild(node.getRight(), node.getDirection());
+            return true;
+        } else if (node.getRight() == null && node.getLeft() != null) {
+            if (node==root) { root = node.getLeft(); return true; }
+            checkBalanceDeletion(node.getParent(), node);
+            node.getParent().setChild(node.getLeft(), node.getDirection());
+            return true;
+        } else {
+            tradeNodes(node, findRightNeighboor(node));
+            return delete(node);
+        }
+    }
+    private void tradeNodes (Node<K> firstNode, Node<K> secondNode) { //todo
+        if (firstNode == null || secondNode == null) return; // Make sure both nodes exist (not null)
+        Node<K> stParent = firstNode.getParent();
+        Direction stDirection = firstNode.getDirection();
+        Node<K> stLeft = firstNode.getLeft();
+        Node<K> stRight = firstNode.getRight();
+
+        //
+        // Set link from and to parent
+        if (secondNode == root) {
+            root = firstNode;
+            firstNode.setParent(null);
+        } else {
+            secondNode.getParent().setChild(firstNode, secondNode.getDirection());
+            firstNode.setParent(secondNode.getParent());
+        }
+        // Set link from left child
+        if (secondNode.getLeft() != null) {
+            secondNode.getLeft().setParent(firstNode);
+        }
+        // Set link from right child
+        if (secondNode.getRight() != null) {
+            secondNode.getRight().setParent(firstNode);
+        }
+        // Links to children
+        firstNode.setLeft(secondNode.getLeft());
+        firstNode.setRight(secondNode.getRight());
+
+        //
+        if (stParent == null) {
+            root = secondNode;
+            secondNode.setParent(null);
+        } else {
+            stParent.setChild(secondNode, stDirection);
+            secondNode.setParent(stParent);
+        }
+        // Set link from left child
+        if (stLeft != null) {
+            stLeft.setParent(secondNode);
+        }
+        // Set link from right child
+        if (stRight != null) {
+            stRight.setParent(secondNode);
+        }
+        // Links to children
+        secondNode.setLeft(stLeft);
+        secondNode.setRight(stRight);
+    }
+    private void checkBalanceDeletion (Node<K> node, Node<K> previousNode) {
+        if (previousNode.getDirection() == Direction.RIGHT) { // previous Node ist rechts von node
+            node.descreaseBalance();
+            if (node.getBalance() == -1 || node.getBalance() == 0) checkBalanceDeletion(node.getParent(), node);
+            else if (node.getBalance() == -2) balance(node, (node.getRight().getBalance() == -1 ? ProblemCase.LEFT_LEFT : ProblemCase.LEFT_RIGHT));
+        } else if (previousNode.getDirection() == Direction.LEFT) { //previous node ist links von node
+            node.increaseBalance();
+            if (node.getBalance() == 1 || node.getBalance() == 0) checkBalanceDeletion(node.getParent(), node);
+            else if (node.getBalance() == 2) balance(node, (node.getRight().getBalance() == 1 ? ProblemCase.RIGHT_RIGHT : ProblemCase.RIGHT_LEFT));
+        }
+    }
+    public boolean delete (K value) {
+        return delete(find(value));
+    }
     
 
 
-    // Balance Checking
+    // Balancing
     private void balance(Node<K> problemNode, ProblemCase problemCase) {
         if (problemCase == ProblemCase.LEFT_LEFT) {
             problemNode.setBalance((byte) 0);
