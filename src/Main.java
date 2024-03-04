@@ -1,13 +1,8 @@
-import trees.Tree;
-
 public class Main {
     public static void main(String[] args) {
-        Tree<Integer> tree = new Tree<>();
-        tree.insert(5, 4, 6, 1, 2, 9);
-        tree.delete(5);
-        //tree.debuggingDisplay();
-
-        for (int i : tree) {
+        Integer[] array = {89356, 789635746, 271, 7, 78954, 25894, 5671, 9678, 123};
+        Integer[] output = Sorting.bubbleSort(array);
+        for (Integer i: output) {
             System.out.println(i);
         }
     }
